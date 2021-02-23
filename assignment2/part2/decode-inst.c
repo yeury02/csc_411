@@ -41,13 +41,15 @@ void readBinFile(const char* fileName) {
     // allocate memory to hold bitString 8 bit string
     int* bitString = (int*)malloc(sizeof(int)*bitLen); // 8 because it is an 8 long bit string
     for (int i=0; i<fSize; i++) {
-        printf("%02x ", buffer[i]);
+        // printf("%02x ", buffer[i]);
         hexToBitString(buffer[i], bitString, bitLen);
         binToInstructions(bitString);
-        binToSregisters(bitString);
-        binToTregisters(bitString);
+        binToTargetRegisters(bitString);
+        binToSourceRegisters(bitString);
+        printf("\n");
     }
     free(buffer);
+    free(bitString);
 
 }
 
@@ -67,57 +69,30 @@ void printBinResult(int* bitString, int bitLen) {
 }
 
 void binToInstructions(int* bitString) {
-    // get instruction
-    if (bitString[0] == 0 && bitString[1] == 0){
-        printf("add ");
-    }
-
-    else if (bitString[0] == 0 && bitString[1] == 1){
-        printf("sub ");
-    }
-
-    else if (bitString[0] == 1 && bitString[1] == 0){
-        printf("lw ");
-    }
-
-    else {
-        printf("sw ");
-    }
+    if (bitString[0] == 0 && bitString[1] == 0) printf("add ");
+    else if (bitString[0] == 0 && bitString[1] == 1) printf("sub ");
+    else if (bitString[0] == 1 && bitString[1] == 0) printf("lw  ");
+    else printf("sw  ");
 }
 
-void binToSregisters(int* bitString) {
-    if (bitString[2] == 0 && bitString[3] == 0 && bitString[4] == 0){
-        printf("$S0 ");
-    }
-
-    else if (bitString[2] == 0 && bitString[3] == 0 && bitString[4] == 1){
-        printf("$S1 ");
-    }
-
-    else if (bitString[2] == 0 && bitString[3] == 1 && bitString[4] == 0){
-        printf("$S2 ");
-    }
-
-    else if (bitString[2] == 0 && bitString[3] == 1 && bitString[4] == 1){
-        printf("$S3 ");
-    }
+void binToTargetRegisters(int* bitString) {
+    if (bitString[2] == 0 && bitString[3] == 0 && bitString[4] == 0) printf("$S0, ");
+    else if (bitString[2] == 0 && bitString[3] == 0 && bitString[4] == 1) printf("$S1, ");
+    else if (bitString[2] == 0 && bitString[3] == 1 && bitString[4] == 0) printf("$S2, ");
+    else if (bitString[2] == 0 && bitString[3] == 1 && bitString[4] == 1) printf("$S3, ");
+    else if (bitString[2] == 1 && bitString[3] == 0 && bitString[4] == 0) printf("$T0, ");
+    else if (bitString[2] == 1 && bitString[3] == 0 && bitString[4] == 1) printf("$T1, ");
+    else if (bitString[2] == 1 && bitString[3] == 1 && bitString[4] == 0) printf("$T2, ");
+    else printf("$T3, ");
 }
 
-void binToTregisters(int* bitString) {
-
-    if (bitString[2] == 1 && bitString[3] == 0 && bitString[4] == 0){
-        printf("$T0 ");
-    }
-
-    else if (bitString[2] == 1 && bitString[3] == 0 && bitString[4] == 1){
-        printf("$T1 ");
-    }
-
-    else if (bitString[2] == 1 && bitString[3] == 1 && bitString[4] == 0){
-        printf("$T2 ");
-    }
-
-    else {
-        printf("$T3 ");
-    }
+void binToSourceRegisters(int* bitString) {
+    if (bitString[5] == 0 && bitString[6] == 0 && bitString[7] == 0) printf("$S0 ");
+    else if (bitString[5] == 0 && bitString[6] == 0 && bitString[7] == 1) printf("$S1 ");
+    else if (bitString[5] == 0 && bitString[6] == 1 && bitString[7] == 0) printf("$S2 ");
+    else if (bitString[5] == 0 && bitString[6] == 1 && bitString[7] == 1) printf("$S3 ");
+    else if (bitString[5] == 1 && bitString[6] == 0 && bitString[7] == 0) printf("$T0 ");
+    else if (bitString[5] == 1 && bitString[6] == 0 && bitString[7] == 1) printf("$T1 ");
+    else if (bitString[5] == 1 && bitString[6] == 1 && bitString[7] == 0) printf("$T2 ");
+    else printf("$T3 ");
 }

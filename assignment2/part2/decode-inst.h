@@ -5,8 +5,8 @@
  * Description: Header file for creating help functions on dealing with binary files
 */
 
-#ifndef HEXDUMP_H
-#define HEXDUMP_H
+#ifndef DECODE_H
+#define DECODE_H
 
 /**
  * @author Yeury Galva Liriano
@@ -21,8 +21,8 @@ void hexToBitString(unsigned char bufferByte, int* bitString, int bitLen);
 void printBinResult(int* bitString, int bitLen);
 
 void binToInstructions(int* bitString);
-void binToSregisters(int* bitString);
-void binToTregisters(int* bitString);
+void binToTargetRegisters(int* bitString);
+void binToSourceRegisters(int* bitString);
 
 
 
