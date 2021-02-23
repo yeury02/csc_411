@@ -37,32 +37,42 @@ void readBinFile(const char* fileName, int N) {
     }
 
     // print output
-    printOutput(result, buffer, N);
+    printOutput(fSize, buffer, N);
 }
 
-void printOutput(size_t result, unsigned char* buffer, int N) {
-        printf("File size = %ld bytes\n", result);
-        printf("Size of each item in bytes = %ld\n", sizeof(unsigned char));
-
-        int tmp = 0;
-        int j = 0;
-        int tracker = 0;
-        for(int i = 0; i<(result/sizeof(unsigned char)); i++) {
+void printOutput(long fSize, unsigned char* buffer, int N) { 
+    for (int i = 0; i < fSize; i++){
+        // helps keep track of the first index of each row
+        if (i % N == 0){
             printf("\n");
-            j = 0;
-            if (tmp == result) {
-                break;
-            }
-            printf("%08x ", tmp);
-            while(j<N) {
-                if (tmp != result) {
-                    printf("%02x ", (int)buffer[tmp]); // prints series of bytes
-                    tmp++;
-                    j++;
-                } else {
-                    break;
-                }
-            }
+            printf("%08x  ", i);
         }
-        free(buffer);
+        printf("%02x ", buffer[i]);
+    }
+    printf("\n");
+    // free memory
+    free(buffer);
 }
+
+
+// int tmp = 0;
+        // int j = 0;
+        // int tracker = 0;
+        // for(int i = 0; i<(result/sizeof(unsigned char)); i++) {
+        //     printf("\n");
+        //     j = 0;
+        //     if (tmp == result) {
+        //         break;
+        //     }
+        //     printf("%08x ", tmp);
+        //     while(j<N) {
+        //         if (tmp != result) {
+        //             printf("%02x ", (int)buffer[tmp]); // prints series of bytes
+        //             tmp++;
+        //             j++;
+        //         } else {
+        //             break;
+        //         }
+        //     }
+        // }
+        // free(buffer);

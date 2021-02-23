@@ -6,6 +6,7 @@
 
 int main(int argc, char* argv[])
 {
+    // error handeling
     if (argc != 3) {
         printf("Usage: %s <FileName> <N>\n", argv[0]);
         return 1;

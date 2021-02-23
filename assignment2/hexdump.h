@@ -22,11 +22,11 @@ void readBinFile(const char* fileName, int N);
  * @date February 22, 2021
  * @brief Prints result in a formatted manner
  * @details This function prints output as specified on assignment
- * @param result number of bytes in file
+ * @param fSize number of bytes in file
  * @param buffer Temporary variable in memory which holds the content of the file
  * @param N Value passed in by the user, used to print output specified by the user
  */
-void printOutput(size_t result, unsigned char* buffer, int N);
+void printOutput(long fSize, unsigned char* buffer, int N);
 
 
 #endif
