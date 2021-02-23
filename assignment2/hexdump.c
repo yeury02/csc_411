@@ -1,35 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char const *argv[])
-{
-    if (argc != 3) {
-        printf("Wrong amount of arguments: <FileName> <N>\n");
-        return 1;
-    }
-    // turns string to int
-    int N = atoi(argv[2]);
-    if (N <= 0) {
-        printf("N must be greater than 0\n");
-        return 1;
-    }
-    
-    FILE *fp = fopen(argv[1], "rb");
+#include "hexdump.h"
+
+void readBinFile(const char* fileName, int N) {
+
+    FILE *fp = fopen(fileName, "rb");
     // check if file sucessfuly opened
     if (fp == NULL) {
         perror("Error opening file: \n");
-        return 1;
+        exit(0);
     }
 
     // obtain file size:
     fseek (fp, 0 , SEEK_END);  // moving position of pointer to end
-    long fSize = ftell (fp);        // gets size of file in bytes
+    long fSize = ftell (fp);   // gets size of file in bytes
     rewind (fp);               // resets the pointer to the beginning
 
-    // printf("%ld\n", fSize);
 
-     // allocate memory to contain the whole file:
-    char* buffer = (char*) malloc (sizeof(char)*fSize);
+    // allocate memory to contain the whole file:
+    unsigned char* buffer = (char*) malloc (sizeof(char)*fSize);  // two's compliment Hint:(Unsinged)
     // if no memory was allocated
     if (buffer == NULL) {
         fputs ("Memory error",stderr); 
@@ -37,24 +28,41 @@ int main(int argc, char const *argv[])
     }
 
     // copy the file into the buffer:
-    size_t result = fread (buffer,1,fSize,fp);
+    size_t result = fread (buffer,sizeof(char),fSize,fp);
+    // close file
+    fclose(fp);
     if (result != fSize) {
-        fputs ("Reading error",stderr); 
+        fputs ("Reading error\n",stderr); 
         exit (3);
     }
 
-    // printf("%ld\n", result);
+    // print output
+    printOutput(result, buffer, N);
+}
 
-    // for(int i = 0; i<result; i++)
-    //     printf("\n");
-    //      for(int j = 0; j<N; j++) {
-    //           printf("%d ", buffer[j]); // prints a series of bytes
-    //      }
+void printOutput(size_t result, unsigned char* buffer, int N) {
+        printf("File size = %ld bytes\n", result);
+        printf("Size of each item in bytes = %ld\n", sizeof(unsigned char));
 
-    for(int i = 0; i<result/sizeof(char); i++)
-        printf("%x\n ", (int)buffer[i]);
-    // printf("%s", buffer);
-
-
-    return 0;
+        int tmp = 0;
+        int j = 0;
+        int tracker = 0;
+        for(int i = 0; i<(result/sizeof(unsigned char)); i++) {
+            printf("\n");
+            j = 0;
+            if (tmp == result) {
+                break;
+            }
+            printf("%08x ", tmp);
+            while(j<N) {
+                if (tmp != result) {
+                    printf("%02x ", (int)buffer[tmp]); // prints series of bytes
+                    tmp++;
+                    j++;
+                } else {
+                    break;
+                }
+            }
+        }
+        free(buffer);
 }
