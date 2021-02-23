@@ -10,7 +10,6 @@ int main(int argc, char* argv[]) {
         printf("Usage: %s <FileName>\n", argv[0]);
         return 1;
     }
-
     char* fileName = argv[1];
     readBinFile(fileName);
 

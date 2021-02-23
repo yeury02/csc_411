@@ -12,13 +12,10 @@ void readBinFile(const char* fileName) {
         perror("Error opening file: \n");
         exit(0);
     }
-
     // obtain file size:
     fseek (fp, 0 , SEEK_END);  // moving position of pointer to end
     long fSize = ftell (fp);   // gets size of file in bytes
     rewind (fp);               // resets the pointer to the beginning
-
-
     // allocate memory to contain the whole file:
     unsigned char* buffer = (char*) malloc (sizeof(char)*fSize);  // two's compliment Hint:(Unsinged)
     // if no memory was allocated
@@ -26,13 +23,10 @@ void readBinFile(const char* fileName) {
         fputs ("Memory error",stderr); 
         exit (2);
     }
-
     // copy the file into the buffer:
     size_t result = fread (buffer,sizeof(char),fSize,fp);
-
     // close file
     fclose(fp);
-
     if (result != fSize) {
         fputs ("Reading error\n",stderr); 
         exit (3);

@@ -16,7 +16,6 @@
  * @param N Second command line argument, used to pass in to printOutput for printing purposes
  */
 void readBinFile(const char* fileName, int N);
-
 /**
  * @author Yeury Galva Liriano
  * @date February 22, 2021
