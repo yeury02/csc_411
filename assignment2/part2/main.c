@@ -14,7 +14,5 @@ int main(int argc, char* argv[]) {
     char* fileName = argv[1];
     readBinFile(fileName);
 
-    int flag = 1;
-
     return 0;
 }

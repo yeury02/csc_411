@@ -29,28 +29,17 @@ void readBinFile(const char* fileName) {
 
     // copy the file into the buffer:
     size_t result = fread (buffer,sizeof(char),fSize,fp);
+
     // close file
     fclose(fp);
+
     if (result != fSize) {
         fputs ("Reading error\n",stderr); 
         exit (3);
     }
-
-    int bitLen = 8;
-
-    // allocate memory to hold bitString 8 bit string
-    int* bitString = (int*)malloc(sizeof(int)*bitLen); // 8 because it is an 8 long bit string
-    for (int i=0; i<fSize; i++) {
-        // printf("%02x ", buffer[i]);
-        hexToBitString(buffer[i], bitString, bitLen);
-        binToInstructions(bitString);
-        binToTargetRegisters(bitString);
-        binToSourceRegisters(bitString);
-        printf("\n");
-    }
-    free(buffer);
-    free(bitString);
-
+    // this function calls all the other helper functions
+    // it is the combination of all functions into 1
+    masterFunc(buffer, fSize);
 }
 
 void hexToBitString(unsigned char bufferByte, int* bitString, int bitLen) {
@@ -95,4 +84,22 @@ void binToSourceRegisters(int* bitString) {
     else if (bitString[5] == 1 && bitString[6] == 0 && bitString[7] == 1) printf("$T1 ");
     else if (bitString[5] == 1 && bitString[6] == 1 && bitString[7] == 0) printf("$T2 ");
     else printf("$T3 ");
+}
+
+void masterFunc(unsigned char* buffer, long fSize) {
+    // length of the bit string ex: 00001010
+    int bitLen = 8;
+    // allocate memory to hold bitString 8 bit string
+    int* bitString = (int*)malloc(sizeof(int)*bitLen); // 8 because it is an 8 long bit string
+    for (int i=0; i<fSize; i++) {
+        // printf("%02x ", buffer[i]);
+        hexToBitString(buffer[i], bitString, bitLen);
+        binToInstructions(bitString);
+        binToTargetRegisters(bitString);
+        binToSourceRegisters(bitString);
+        printf("\n");
+    }
+    // free allocated memory
+    free(buffer);
+    free(bitString);
 }

@@ -17,6 +17,8 @@
  */
 void readBinFile(const char* fileName);
 
+void masterFunc(unsigned char* buffer, long fSize);
+
 void hexToBitString(unsigned char bufferByte, int* bitString, int bitLen);
 void printBinResult(int* bitString, int bitLen);
 
