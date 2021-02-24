@@ -80,7 +80,7 @@ void printOutput(long fSize, unsigned char* buffer, int N) {
                 printf("\n");
             }
             // %08 allows to print 8 bit strings
-            printf("%08x  ", i);
+            printf("%08x ", i);
         }
         printf("%02x ", buffer[i]);
     }
