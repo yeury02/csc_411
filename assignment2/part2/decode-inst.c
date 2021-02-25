@@ -2,7 +2,38 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "decode-inst.h"
+/**
+ * @author Yeury Galva Liriano
+ * @date February 22, 2021
+ * @brief readBinFile function reads a binary file
+ * @details This function is useful to know that it is reading a binary file properly
+ * @param fileName Pointer to the file that will be attempted to be open
+ */
+void readBinFile(const char* fileName);
+
+/**
+ * @author Yeury Galva Liriano
+ * @date February 25, 2021
+ * @brief Prints result in a formatted manner
+ * @details This function prints output as specified on assignment
+ * @param buffer Temporary variable in memory which holds the content of the file
+ * @param N Size of file in bytes
+ */
+void printResults(unsigned char* buffer, long fileSize);
+
+int main(int argc, char* argv[]) {
+
+    // error handeling
+    if (argc != 2) {
+        printf("Usage: %s <FileName>\n", argv[0]);
+        return 1;
+    }
+    char* fileName = argv[1];
+    // this function returns a dynamic array buffer
+    readBinFile(fileName);
+
+    return 0;
+}
 
 void readBinFile(const char* fileName) {
 
@@ -16,6 +47,7 @@ void readBinFile(const char* fileName) {
     fseek (fp, 0 , SEEK_END);  // moving position of pointer to end
     long fSize = ftell (fp);   // gets size of file in bytes
     rewind (fp);               // resets the pointer to the beginning
+
     // allocate memory to contain the whole file:
     unsigned char* buffer = (char*) malloc (sizeof(char)*fSize);  // two's compliment Hint:(Unsinged)
     // if no memory was allocated
@@ -31,69 +63,22 @@ void readBinFile(const char* fileName) {
         fputs ("Reading error\n",stderr); 
         exit (3);
     }
-    // this function calls all the other helper functions
-    // it is the combination of all functions into 1
-    masterFunc(buffer, fSize);
-}
-
-void hexToBitString(unsigned char bufferByte, int* bitString, int bitLen) {
-    for (int j=0; j<bitLen; j++) {
-        bitString[7-j] = (bufferByte >> j) & 1;
-    }
-    printBinResult(bitString, bitLen);
-}
-
-
-void printBinResult(int* bitString, int bitLen) {
-    for(int n = 0; n <bitLen; n++) {
-        printf("%d", bitString[n]);
-    }
-    printf(" ");
-}
-
-void binToInstructions(int* bitString) {
-    if (bitString[0] == 0 && bitString[1] == 0) printf("add ");
-    else if (bitString[0] == 0 && bitString[1] == 1) printf("sub ");
-    else if (bitString[0] == 1 && bitString[1] == 0) printf("lw  ");
-    else printf("sw  ");
-}
-
-void binToTargetRegisters(int* bitString) {
-    if (bitString[2] == 0 && bitString[3] == 0 && bitString[4] == 0) printf("$S0, ");
-    else if (bitString[2] == 0 && bitString[3] == 0 && bitString[4] == 1) printf("$S1, ");
-    else if (bitString[2] == 0 && bitString[3] == 1 && bitString[4] == 0) printf("$S2, ");
-    else if (bitString[2] == 0 && bitString[3] == 1 && bitString[4] == 1) printf("$S3, ");
-    else if (bitString[2] == 1 && bitString[3] == 0 && bitString[4] == 0) printf("$T0, ");
-    else if (bitString[2] == 1 && bitString[3] == 0 && bitString[4] == 1) printf("$T1, ");
-    else if (bitString[2] == 1 && bitString[3] == 1 && bitString[4] == 0) printf("$T2, ");
-    else printf("$T3, ");
-}
-
-void binToSourceRegisters(int* bitString) {
-    if (bitString[5] == 0 && bitString[6] == 0 && bitString[7] == 0) printf("$S0 ");
-    else if (bitString[5] == 0 && bitString[6] == 0 && bitString[7] == 1) printf("$S1 ");
-    else if (bitString[5] == 0 && bitString[6] == 1 && bitString[7] == 0) printf("$S2 ");
-    else if (bitString[5] == 0 && bitString[6] == 1 && bitString[7] == 1) printf("$S3 ");
-    else if (bitString[5] == 1 && bitString[6] == 0 && bitString[7] == 0) printf("$T0 ");
-    else if (bitString[5] == 1 && bitString[6] == 0 && bitString[7] == 1) printf("$T1 ");
-    else if (bitString[5] == 1 && bitString[6] == 1 && bitString[7] == 0) printf("$T2 ");
-    else printf("$T3 ");
-}
-
-void masterFunc(unsigned char* buffer, long fSize) {
-    // length of the bit string ex: 00001010
-    int bitLen = 8;
-    // allocate memory to hold bitString 8 bit string
-    int* bitString = (int*)malloc(sizeof(int)*bitLen); // 8 because it is an 8 long bit string
-    for (int i=0; i<fSize; i++) {
-        // printf("%02x ", buffer[i]);
-        hexToBitString(buffer[i], bitString, bitLen);
-        binToInstructions(bitString);
-        binToTargetRegisters(bitString);
-        binToSourceRegisters(bitString);
-        printf("\n");
-    }
-    // free allocated memory
+    // prints results
+    printResults(buffer, fSize);
+    // terminate
     free(buffer);
-    free(bitString);
+}
+
+void printResults(unsigned char* buffer, long fileSize) {
+    char opCodes[4][4] = {"add", "sub", "lw", "sw"};
+    char instructions[8][4] = {"$S0", "$S1", "$S2", "$S3", "$T0", "$T1", "$T2", "$T3"};
+    
+    int opcode, inst1, inst2;
+    for (long i = 0; i < fileSize; i++) {   
+        // Here I do bitwise operations and right shifting
+        opcode = (buffer[i] & 0xC0) >> 6;
+        inst1 = (buffer[i] & 0x38) >> 3;
+        inst2 = (buffer[i] & 0x07);
+        printf("%s %s, %s\n", opCodes[opcode], instructions[inst1], instructions[inst2]);
+    }
 }
