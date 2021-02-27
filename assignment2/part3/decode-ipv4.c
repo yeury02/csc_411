@@ -13,8 +13,8 @@ void readBinFile(const char* fileName);
 
 void getEvery5Bytes(unsigned char* buffer, long fileSize);
 void readEvery5Bytes(unsigned char* fiveBytes, int count);
-char* mask(int lastByte);
-void ipAdresstoBinary(unsigned char* buffer);
+void mask(int lastByte);
+void ipAdresstoBinary(unsigned char* buffer, char* mask);
 
 int main(int argc, char* argv[]) {
 
@@ -59,6 +59,7 @@ void readBinFile(const char* fileName) {
         exit (3);
     }
     getEvery5Bytes(buffer, fSize);
+
     // terminate
     free(buffer);
 }
@@ -87,13 +88,13 @@ void getEvery5Bytes(unsigned char* buffer, long fileSize) {
     // this handles the remaining last characters
     // if file size is not multiple of 5
     readEvery5Bytes(fiveBytes, every5Count);
-
     free(fiveBytes);
 }
 
-char* readEvery5Bytes(unsigned char* fiveBytes, int count) {
+void readEvery5Bytes(unsigned char* fiveBytes, int count) {
     // as long as the bytes are multiple of fives
     // otherwise ignore
+    char* bits;
     if (count == 5) {
         printf("IP address:      ");
     }
@@ -120,7 +121,7 @@ char* readEvery5Bytes(unsigned char* fiveBytes, int count) {
 }
 
 // number of bits in the subnet mask
-char* mask(int lastByte) {
+void mask(int lastByte) {
     
     char* bits = (char*)malloc(sizeof(char)*32); // subnet mask has 32 bits
     int num=0;
@@ -148,10 +149,4 @@ char* mask(int lastByte) {
         }
         count++;
     }
-    return bits;
-}
-
-void ipAdresstoBinary(unsigned char* buffer) {
-    
-
 }
