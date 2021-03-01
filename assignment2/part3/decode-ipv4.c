@@ -2,19 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @author Yeury Galva Liriano
- * @date February 22, 2021
- * @brief readBinFile function reads a binary file
- * @details This function is useful to know that it is reading a binary file properly
- * @param fileName Pointer to the file that will be attempted to be open
- */
+// This function is used to read a binary file
 void readBinFile(const char* fileName);
-
 void getEvery5Bytes(unsigned char* buffer, long fileSize);
 void readEvery5Bytes(unsigned char* fiveBytes, int count);
-void mask(int lastByte);
+char* mask(int lastByte);
 void ipAdresstoBinary(unsigned char* buffer, char* mask);
+void hostRange(unsigned char* networkAddress, unsigned char* subnetMask, int lastByte);
+void printSubnetMask(unsigned char* subnetMask);
+unsigned char* buffer;
+// this will be helpful to do bitwise AND comparison
+int index_comp = 0;
 
 int main(int argc, char* argv[]) {
 
@@ -44,7 +42,7 @@ void readBinFile(const char* fileName) {
     rewind (fp);               // resets the pointer to the beginning
 
     // allocate memory to contain the whole file:
-    unsigned char* buffer = (char*) malloc (sizeof(char)*fSize);  // two's compliment Hint:(Unsinged)
+    buffer = (char*) malloc (sizeof(char)*fSize);  // two's compliment Hint:(Unsinged)
     // if no memory was allocated
     if (buffer == NULL) {
         fputs ("Memory error",stderr); 
@@ -106,12 +104,12 @@ void readEvery5Bytes(unsigned char* fiveBytes, int count) {
         // this is checking I am at the last byte of the 5 bytes
         } else if((count-1)==i) {
             // I am at the last byte
-            printf("---%d---", fiveBytes[i]);
             printf("\n");
-            mask(fiveBytes[i]);
+            bits = mask(fiveBytes[i]);
         } else {
             // print the first 4 bytes
-            printf("%d.", fiveBytes[i]);
+            if (i == 3) printf("%d", fiveBytes[i]);
+            else printf("%d.", fiveBytes[i]);
         }
     }
     // to take care of not having an extra new line at the end
@@ -121,13 +119,20 @@ void readEvery5Bytes(unsigned char* fiveBytes, int count) {
 }
 
 // number of bits in the subnet mask
-void mask(int lastByte) {
-    
+char* mask(int lastByte) {
+    // to store 32 long bitStrings
     char* bits = (char*)malloc(sizeof(char)*32); // subnet mask has 32 bits
-    int num=0;
+    unsigned int num=0;
+    // highest number of a 8bitString
     int binStartingCount=128;
     int count = 0;
-    printf("Subnet Mask:     ");
+    // this will be useful to calculate host Range
+    int remainingZeros = lastByte - remainingZeros;
+    int bufferCount = 0;
+    unsigned char* networkAddress = (char*)malloc(sizeof(char)*4);
+    unsigned char* subnetMask = (char*)malloc(sizeof(char)*4);
+
+    printf("Network address: ");
  
     // it will always be a 32 bitstring
     for(int i=0; i<32; i++){
@@ -143,10 +148,61 @@ void mask(int lastByte) {
         }
         // to know when I have seen 8 bits
         if ((count+1)%8 == 0) {
-            printf("%d.", num);
+            // bitwise AND comparison
+            int ans = (buffer[index_comp] & num);
+            // store network address
+            networkAddress[bufferCount] = ans;
+            // store submask
+            subnetMask[bufferCount] = num;
+            // to avoid an extra period at the end
+            if (bufferCount == 3) {
+                printf("%d", ans);
+            }
+            else {
+                printf("%d.", ans);
+            }
+            bufferCount++;
+            index_comp++;
             num = 0;
             binStartingCount = 128;
         }
         count++;
     }
+    index_comp++;
+    hostRange(networkAddress, subnetMask, lastByte);
+    printSubnetMask(subnetMask);
+
+    return bits;
+}
+
+void hostRange(unsigned char* networkAddress, unsigned char* subnetMask, int lastByte) {
+    printf("\nUsable IP range: ");
+    // just change the last byte of IP address to get 
+    // first part of host rage
+    for(int i = 0; i < 4; i++){
+        unsigned char tmp;
+        if (i != 3) tmp = (networkAddress[i] ^ 0x00);
+        else tmp = (networkAddress[i] ^ 0x01);
+        if (i == 3) printf("%d", tmp);
+        else printf("%d.", tmp);
+    }
+    printf(" - ");
+    // grab from
+    for(long i = 0; i < 4; i++){
+        unsigned char tmp;
+        // XOR and OR bitwise operations
+        if (i != 3) tmp = ((networkAddress[i] | (~subnetMask[i])) ^ 0x00);
+        else tmp = ((networkAddress[i] | (~subnetMask[i])) ^ 0x01);
+        if (i == 3) printf("%d", tmp);
+        else printf("%d.", tmp);
+    }
+}
+// Function prints the subnet mask
+void printSubnetMask(unsigned char* subnetMask) {
+    printf("\nSubnet mask:     ");
+    for(int i=0; i<4; i++) {
+        if (i == 3) printf("%d", subnetMask[i]);
+        else printf("%d.", subnetMask[i]);
+    }
+    printf("\n");
 }
